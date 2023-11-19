@@ -79,3 +79,23 @@
 // ****************************
 // Lecture: Operators Precdence
 // ****************************
+
+// ----------------------------------------------------------------------------->
+
+// ****************************
+// Lecture: Operators Precdence
+// ****************************
+
+const firstName = "Umar";
+const job = "software developer intern";
+const birthYear = 2002;
+const year = 2023;
+
+// Using quotes
+const umar =
+  "I'm " + firstName + ", a " + (year - birthYear) + " years old " + job;
+console.log(umar);
+
+// Using backticks ``
+const umarNew = `I'm ${firstName}, a ${year - birthYear} years old ${job}!`;
+console.log(umarNew);

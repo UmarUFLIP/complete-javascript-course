@@ -79,20 +79,74 @@ const displayMovements = function (movements) {
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-          <div class="movements__value">${mov}</div>
+          <div class="movements__value">${mov}€</div>
         </div>
     `;
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements);
+// displayMovements(account1.movements);  // Want to call this when logged in
 
 /* Calculate and display the balance. The top right right now is 0000€. Calulating it and using DOM manipulation to display it.*/
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, currVal) => acc + currVal, 0);
-  labelBalance.textContent = `${balance}€`;
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce((acc, currVal) => acc + currVal, 0); // created property called balance so we can retrieve it later.
+  labelBalance.textContent = `${acc.balance}€`;
 };
-calcDisplayBalance(account1.movements);
+// calcDisplayBalance(account1.movements);  // Want to call this when logged in
+
+/* 
+  Lecture: Chaining Methods 
+  Using different array methods to manipulate and update the text contents on the bottom left of the page.
+*/
+const calcDisplaySummary = function (acct) {
+  const incomes = acct.movements
+    .filter(mov => mov > 0) // filter only those that are above 0 (deposits)
+    .reduce((acc, mov) => acc + mov, 0); // Add all those deposits you have made
+  labelSumIn.textContent = `${incomes}€`; // Display it bottom left of page for the "IN" text content.
+
+  const out = acct.movements
+    .filter(mov => mov < 0) // filter out the negative values (withdrawals)
+    .reduce((acc, mov) => acc + mov, 0); // Add them up
+  labelSumOut.textContent = `${Math.abs(out)}€`; // Display it on bottom left for "OUT" text.
+
+  // Say the bank charges 1.2% interest each deposit (not real world example)
+  const interest = acct.movements
+    .filter(mov => mov > 0) // filter out only positive values (deposits)
+    .map(deposit => (deposit * acct.interestRate) / 100) // Add 1.2% of interest to all deposits
+    .filter((int, i, arr) => int >= 1) // Filter out the values that are below 1€ because the bank does not add it to interest if value is below 1 (ex)
+    .reduce((acc, interestMoney) => acc + interestMoney, 0); // Calculate the total interest.
+
+  labelSumInterest.textContent = `${interest}€`;
+};
+// calcDisplaySummary(account1.movements); // Want to call this when logged in
+
+// Events Handler
+let currentAccount; // Need this outside so we can keep track of which account money transfer out of (later on in this section)
+
+btnLogin.addEventListener('click', function (e) {
+  // Prevents form from submitting
+  e.preventDefault(); // Forms are nice because hitting enter in either of the 2 input fields will trigger the click event.
+
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  console.log(currentAccount);
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // DISPLAY UI and welcome message
+    labelWelcome.textContent = `Welcome Back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+
+    // Clear input fields and lose its focus
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    // Update the UI
+    updateUI(currentAccount);
+  }
+});
 
 // Convert to lowercase and split it up
 // const username = user.toLowerCase().split(' ');
@@ -113,6 +167,40 @@ const createUsernames = function (accts) {
 };
 
 createUsernames(accounts);
+
+const updateUI = function (acc) {
+  // Display movements
+  displayMovements(acc.movements);
+
+  // Display balance
+  calcDisplayBalance(acc);
+
+  // Display Summary
+  calcDisplaySummary(acc);
+};
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault(); // this is a form so prevent the default behavior of refreshing page
+  const amount = Number(inputTransferAmount.value);
+  const recieverAcc = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+
+  // Clear input fields and lose its focus
+  inputTransferAmount.value = inputTransferTo.value = '';
+  if (
+    amount > 0 &&
+    recieverAcc &&
+    currentAccount.balance >= amount &&
+    recieverAcc?.username !== currentAccount.username
+  ) {
+    currentAccount.movements.push(-amount);
+    recieverAcc.movements.push(amount);
+
+    // Update the UI
+    updateUI(currentAccount);
+  }
+});
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -127,25 +215,3 @@ createUsernames(accounts);
 
 /////////////////////////////////////////////////
 //                LECTURES:
-
-// *** Reduce method ***
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-// Arrow function way:
-const balance = movements.reduce((accumulator, curr) => accumulator + curr, 0);
-console.log(balance);
-
-// Another way:
-let balance2 = 0; // Need external variable
-for (const mov of movements) balance2 += mov;
-console.log(balance2);
-
-// Another example of using reduce method
-// Get Maximum value of the movement array
-const max = movements.reduce((acc, mov) => {
-  if (acc > mov)
-    return acc; // We have to return acc to next iteration and in this case we do not want the acc to change because it is bigger.
-  else return mov;
-}, movements[0]);
-
-console.log(max);

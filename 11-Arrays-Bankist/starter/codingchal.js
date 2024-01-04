@@ -44,7 +44,8 @@ const checkDogs = function (dogsJulia, dogsKate) {
   });
 };
 
-checkDogs([3, 5, 2, 12, 7], [4, 1, 15, 8, 3]);
+// checkDogs([3, 5, 2, 12, 7], [4, 1, 15, 8, 3]);
+
 /*
 The Complete JavaScript Course 24
 Coding Challenge #2
@@ -68,8 +69,28 @@ Test data:
 2. [16, 6, 10, 5, 6, 1, 4]
 
 GOOD LUCK 😀
-
 */
+// Takes in dog ages
+const calcAverageHumanAge = function (ages) {
+  // want to create humanAges
+  const humanAges = ages.map(age => (age <= 2 ? 2 * age : 16 + age * 4)); // Arrow function, if age is <= 2 then return 2 * age else return 16 + age * 4. The return is implicit in arrow functions
+
+  // Filtering dog ages who are over 18 years in human ages.
+  const adults = humanAges.filter(age => age >= 18);
+  console.log(humanAges, adults);
+
+  // Calculating the average
+  //   const average = adults.reduce((acc, age) => acc + age, 0) / adults.length; // You can do (2+3) / 2 = 2.5 which is the same as 2/2 + 3/2 = 2.5.
+  // So instead of above, we can do:
+  const average = adults.reduce(
+    (acc, age, i, arr) => acc + age / arr.length, // We are immediately dividing the age by the length of the array.
+    0
+  );
+
+  return average;
+};
+// console.log(calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]));
+// console.log(calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]));
 
 /*
 Coding Challenge #3
@@ -82,6 +103,16 @@ Test data:
 
 GOOD LUCK 😀
 */
+
+// Jonas's solution
+const calcAverageHumanAge2 = ages =>
+  ages
+    .map(age => (age <= 2 ? 2 * age : 16 + age * 4))
+    .filter(age => age >= 18)
+    .reduce((acc, age, i, arr) => acc + age / arr.length, 0); // We need to take the length from the arr parameter, recall we did not store the result of filter in some variable and therefore cannot call .length on it.
+
+console.log(calcAverageHumanAge2([5, 2, 4, 1, 15, 8, 3]));
+console.log(calcAverageHumanAge2([16, 6, 10, 5, 6, 1, 4]));
 
 /*
 Coding Challenge #4
@@ -126,10 +157,10 @@ Hints:
    1.10). Basically, the current portion should be between 90% and 110% of the
    recommended portion. */
 
-// Test Data:
-const dogs = [
-  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
-  { weight: 8, curFood: 200, owners: ['Matilda'] },
-  { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
-  { weight: 32, curFood: 340, owners: ['Michael'] },
-];
+// // // Test Data:
+// const dogs = [
+//   { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+//   { weight: 8, curFood: 200, owners: ['Matilda'] },
+//   { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+//   { weight: 32, curFood: 340, owners: ['Michael'] },
+// ];

@@ -33,7 +33,14 @@ const account4 = {
   pin: 4444,
 };
 
-const accounts = [account1, account2, account3, account4];
+const account5 = {
+  owner: 'Umar Mian',
+  movements: [10200, 1000, -45, -230, -167, 170, 320, 32, 450, -630],
+  interestRate: 0.5,
+  pin: 5555,
+};
+
+const accounts = [account1, account2, account3, account4, account5];
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -61,16 +68,84 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+const displayMovements = function (movements) {
+  // Fixes the problem where the old 'stub' data was still on the page. The deposit of 4,000€ and withdrawal of 378€
+  containerMovements.innerHTML = '';
+  movements.forEach(function (mov, i) {
+    const type = mov > 0 ? 'deposit' : 'withdrawal';
+
+    const html = `
+    <div class="movements__row">
+          <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
+          <div class="movements__value">${mov}</div>
+        </div>
+    `;
+    containerMovements.insertAdjacentHTML('afterbegin', html);
+  });
+};
+displayMovements(account1.movements);
+
+/* Calculate and display the balance. The top right right now is 0000€. Calulating it and using DOM manipulation to display it.*/
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((acc, currVal) => acc + currVal, 0);
+  labelBalance.textContent = `${balance}€`;
+};
+calcDisplayBalance(account1.movements);
+
+// Convert to lowercase and split it up
+// const username = user.toLowerCase().split(' ');
+/* Splitting it up will put it into an array. Now we need to loop over array
+  Take the first letter in each array and join those letters and put into the new array of logins/usernames
+*/
+/* 
+  We looped over the accounts array, and in each iteration manipulated the current account object, and added/edited a username based on the account owner + all the transformation
+*/
+const createUsernames = function (accts) {
+  accts.forEach(function (acc) {
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name[0])
+      .join('');
+  });
+};
+
+createUsernames(accounts);
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
+// const currencies = new Map([
+//   ['USD', 'United States dollar'],
+//   ['EUR', 'Euro'],
+//   ['GBP', 'Pound sterling'],
+// ]);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+//                LECTURES:
+
+// *** Reduce method ***
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+// Arrow function way:
+const balance = movements.reduce((accumulator, curr) => accumulator + curr, 0);
+console.log(balance);
+
+// Another way:
+let balance2 = 0; // Need external variable
+for (const mov of movements) balance2 += mov;
+console.log(balance2);
+
+// Another example of using reduce method
+// Get Maximum value of the movement array
+const max = movements.reduce((acc, mov) => {
+  if (acc > mov)
+    return acc; // We have to return acc to next iteration and in this case we do not want the acc to change because it is bigger.
+  else return mov;
+}, movements[0]);
+
+console.log(max);
